@@ -164,7 +164,7 @@ export function DonationSection() {
 
             <div className="relative aspect-[4/3] rounded-2xl overflow-hidden">
               <Image
-                src="https://cdn.abacus.ai/images/c6a06b40-53ab-4929-949d-f14afd893061.jpg"
+                src="/images/donation-edukacja.jpg"
                 alt="Wsparcie edukacji technologicznej dzieci"
                 fill
                 className="object-cover"

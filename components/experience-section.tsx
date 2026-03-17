@@ -80,7 +80,7 @@ export function ExperienceSection() {
             className="relative aspect-[4/3] rounded-2xl overflow-hidden"
           >
             <Image
-              src="https://cdn.abacus.ai/images/ce78d31e-d81b-4c93-9d11-a44346d002a2.jpg"
+              src="/images/experience-zespol.jpg"
               alt="Zespół edukatorów Fundacji EduCode"
               fill
               className="object-cover"

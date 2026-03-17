@@ -10,13 +10,13 @@ const stories = [
     name: 'Kacper, 12 lat',
     role: 'Uczestnik programu robotyki',
     quote: 'Dzięki warsztatom z LEGO Mindstorms odkryłem, że programowanie może być super zabawą! Teraz sam tworzę roboty w domu.',
-    image: 'https://cdn.abacus.ai/images/484aeb17-7a32-4370-8312-d53923a22f1a.jpg',
+    image: '/images/story-kacper.jpg',
   },
   {
     name: 'SP nr 3 w Sycowie',
     role: 'Szkoła partnerska',
     quote: 'Współpraca z Fundacją EduCode pozwoliła nam wprowadzić nowoczesne zajęcia z robotyki. Uczniowie są zachwyceni!',
-    image: 'https://cdn.abacus.ai/images/f6548c43-f9ea-4811-9b91-df3623a0fd49.jpg',
+    image: '/images/story-sp-sycow.jpg',
   },
 ]
 

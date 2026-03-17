@@ -79,7 +79,7 @@ export function MissionSection() {
             className="relative aspect-[4/3] rounded-2xl overflow-hidden"
           >
             <Image
-              src="https://cdn.abacus.ai/images/ca230193-0017-4251-b4de-b29809f09727.jpg"
+              src="/images/mission-innowacja.jpg"
               alt="Innowacja i wartości fundacji EduCode"
               fill
               className="object-cover"
