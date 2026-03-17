@@ -6,10 +6,10 @@ import { Menu, X, Heart } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 const navItems = [
-  { href: '#misja', label: 'Misja' },
-  { href: '#programy', label: 'Programy' },
-  { href: '#faq', label: 'FAQ' },
-  { href: '#kontakt', label: 'Kontakt' },
+  { href: '/#misja', label: 'Misja' },
+  { href: '/#programy', label: 'Programy' },
+  { href: '/#faq', label: 'FAQ' },
+  { href: '/#kontakt', label: 'Kontakt' },
 ]
 
 export function Header() {
@@ -49,7 +49,7 @@ export function Header() {
               </Link>
             )) ?? []}
             <Link
-              href="#donacje"
+              href="/#donacje"
               className="bg-[#FF6B35] text-white px-5 py-2.5 rounded-full font-semibold hover:bg-[#e85a2a] transition-all flex items-center gap-2 shadow-lg hover:shadow-xl"
             >
               <Heart className="w-4 h-4" />
@@ -87,7 +87,7 @@ export function Header() {
                 </Link>
               )) ?? []}
               <Link
-                href="#donacje"
+                href="/#donacje"
                 onClick={() => setMobileMenuOpen(false)}
                 className="bg-[#FF6B35] text-white px-5 py-3 rounded-full font-semibold text-center mt-2"
               >
