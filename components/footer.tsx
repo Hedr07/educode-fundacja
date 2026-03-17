@@ -59,7 +59,7 @@ export function Footer() {
             <ul className="space-y-3 text-white/70">
               <li>
                 <a href="mailto:kontakt@educode.pl" className="hover:text-[#FF6B35] transition-colors">
-                  kontakt@educode.pl
+                  kontakt@educode.org.pl
                 </a>
               </li>
               <li>
