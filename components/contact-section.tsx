@@ -80,7 +80,7 @@ export function ContactSection() {
                 <div>
                   <h3 className="font-semibold text-[#1A2332] mb-1">Email</h3>
                   <a href="mailto:kontakt@educode.org.pl" className="text-[#FF6B35] hover:underline">
-                    kontakt@educode.pl
+                    kontakt@educode.org.pl
                   </a>
                 </div>
               </div>
