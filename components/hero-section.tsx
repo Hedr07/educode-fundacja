@@ -64,7 +64,7 @@ export function HeroSection() {
           >
             <div className="relative aspect-[16/10] rounded-2xl overflow-hidden shadow-2xl">
               <Image
-                src="https://cdn.abacus.ai/images/d9498b99-5cd6-4afd-89b1-e6157c33a4d3.jpg"
+                src="/images/hero-dzieci-lego.jpg"
                 alt="Dzieci uczą się programowania i robotyki LEGO"
                 fill
                 className="object-cover"
