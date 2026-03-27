@@ -3,7 +3,7 @@ import crypto from 'crypto'
 
 const P24_MERCHANT_ID = process.env.P24_MERCHANT_ID!
 const P24_REPORT_KEY = process.env.P24_REPORT_KEY!
-const IS_SANDBOX = process.env.NODE_ENV !== 'production'
+const IS_SANDBOX = process.env.P24_USE_SANDBOX === 'true'
 const P24_CRC = IS_SANDBOX
   ? process.env.P24_SANDBOX_CRC!
   : process.env.P24_CRC!
