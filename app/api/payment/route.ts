@@ -35,10 +35,14 @@ export async function POST(req: Request) {
       hasCrc: !!crc,
     });
 
-    const p24 = new P24(merchantId, posId, crc!, {
-      sandbox: useSandbox,
-      apiKey: apiKey!,
-    });
+    // --- POPRAWNY KONSTRUKTOR ---
+    const p24 = new P24(merchantId, posId, crc!);
+
+    // --- POPRAWNE USTAWIENIE SANDBOX ---
+    p24.setSandbox(useSandbox);
+
+    // --- POPRAWNE USTAWIENIE API KEY ---
+    p24.setApiKey(apiKey!);
 
     const sessionId = `donation_${Date.now()}`;
 
