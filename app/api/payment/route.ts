@@ -7,6 +7,9 @@ const IS_SANDBOX = process.env.P24_USE_SANDBOX === 'true'
 const P24_CRC = IS_SANDBOX
   ? process.env.P24_SANDBOX_CRC!
   : process.env.P24_CRC!
+const P24_AUTH_KEY = IS_SANDBOX
+  ? process.env.P24_SANDBOX_API_KEY!
+  : process.env.P24_REPORT_KEY!
 const P24_BASE_URL = IS_SANDBOX
   ? 'https://sandbox.przelewy24.pl'
   : 'https://secure.przelewy24.pl'
@@ -52,7 +55,7 @@ export async function POST(req: NextRequest) {
       sign,
     }
 
-    const credentials = Buffer.from(`${P24_MERCHANT_ID}:${P24_REPORT_KEY}`).toString('base64')
+    const credentials = Buffer.from(`${P24_MERCHANT_ID}:${P24_AUTH_KEY}`).toString('base64')
 
     const response = await fetch(`${P24_BASE_URL}/api/v1/transaction/register`, {
       method: 'POST',
