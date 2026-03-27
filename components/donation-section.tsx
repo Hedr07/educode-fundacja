@@ -13,9 +13,6 @@ export function DonationSection() {
   const [selectedAmount, setSelectedAmount] = useState<number | 'custom'>(50)
   const [customAmount, setCustomAmount] = useState('')
   const [copied, setCopied] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-  const [frequency, setFrequency] = useState<'once' | 'monthly'>('once')
 
   const bankAccount = '81 2530 0008 2041 1089 0411 0001'
 
@@ -29,31 +26,8 @@ export function DonationSection() {
     }
   }
 
-  const handlePayment = async () => {
-    const amount = selectedAmount === 'custom' ? parseFloat(customAmount) : selectedAmount
-    if (!amount || isNaN(Number(amount)) || Number(amount) <= 0) {
-      setError('Podaj prawidłową kwotę')
-      return
-    }
-    setError('')
-    setLoading(true)
-    try {
-      const res = await fetch('/api/payment', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount, frequency }),
-      })
-      const data = await res.json()
-      if (data.redirectUrl) {
-        window.location.href = data.redirectUrl
-      } else {
-        setError(data.error || 'Wystąpił błąd. Spróbuj ponownie.')
-      }
-    } catch {
-      setError('Wystąpił błąd. Spróbuj ponownie.')
-    } finally {
-      setLoading(false)
-    }
+  const handlePayment = () => {
+    alert('Integracja z Przelewy24 w przygotowaniu. Prosimy o wpłatę tradycyjnym przelewem.')
   }
 
   return (
@@ -88,22 +62,9 @@ export function DonationSection() {
               <h3 className="text-2xl font-bold text-[#1A2332]">Wpłata online</h3>
             </div>
 
-            <div className="flex gap-3 mb-6">
-              <button
-                onClick={() => setFrequency('once')}
-                className={`flex-1 py-2 rounded-xl font-semibold transition-all text-sm ${frequency === 'once' ? 'bg-[#FF6B35] text-white' : 'bg-[#F8F9FA] text-[#1A2332]'}`}
-              >
-                Jednorazowo
-              </button>
-              <button
-                onClick={() => setFrequency('monthly')}
-                className={`flex-1 py-2 rounded-xl font-semibold transition-all text-sm ${frequency === 'monthly' ? 'bg-[#FF6B35] text-white' : 'bg-[#F8F9FA] text-[#1A2332]'}`}
-              >
-                Miesięcznie
-              </button>
-            </div>
-
-            <p className="text-[#1A2332]/70 mb-6">Wybierz kwotę darowizny:</p>
+            <p className="text-[#1A2332]/70 mb-6">
+              Wybierz kwotę darowizny:
+            </p>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
               {amounts?.map?.((amount) => (
@@ -140,19 +101,16 @@ export function DonationSection() {
               </div>
             </div>
 
-            {error && <p className="text-red-500 text-sm mb-4 text-center">{error}</p>}
-
             <button
               onClick={handlePayment}
-              disabled={loading}
-              className="w-full bg-[#FF6B35] text-white py-4 rounded-xl font-semibold hover:bg-[#e85a2a] transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-xl disabled:opacity-50"
+              className="w-full bg-[#FF6B35] text-white py-4 rounded-xl font-semibold hover:bg-[#e85a2a] transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-xl"
             >
               <Heart className="w-5 h-5" />
-              {loading ? 'Przekierowuję...' : 'Wpłać przez Przelewy24'}
+              Wpłać przez Przelewy24
             </button>
 
             <p className="text-xs text-[#1A2332]/50 mt-4 text-center">
-              Bezpieczna płatność — BLIK, karta, przelew
+              Integracja z Przelewy24 w przygotowaniu. Aktualnie prosimy o wpłatę tradycyjnym przelewem.
             </p>
           </motion.div>
 
