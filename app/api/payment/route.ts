@@ -27,7 +27,6 @@ export async function POST(req: Request) {
       ? process.env.P24_SANDBOX_CRC
       : process.env.P24_CRC;
 
-    // === DEBUG START ===
     console.log("=== P24 DEBUG START ===");
     console.log("useSandbox:", useSandbox);
     console.log("merchantId:", merchantId);
@@ -36,13 +35,9 @@ export async function POST(req: Request) {
     console.log("crc:", crc);
     console.log("REQUEST_BODY:", body);
     console.log("=== P24 DEBUG END ===");
-    // === DEBUG END ===
 
-    // POPRAWNY KONSTRUKTOR DLA TWOJEJ WERSJI SDK (4 ARGUMENTY)
-    const p24 = new P24(merchantId, posId, apiKey!, crc!);
-
-    // SANDBOX / PRODUKCJA
-    p24.setSandbox(useSandbox);
+    // POPRAWNY KONSTRUKTOR DLA TWOJEGO SDK (5 ARGUMENTÓW)
+    const p24 = new P24(merchantId, posId, apiKey!, crc!, useSandbox);
 
     const sessionId = `donation_${Date.now()}`;
 
