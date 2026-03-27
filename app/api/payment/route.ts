@@ -2,11 +2,14 @@ console.log("ENV CHECK", {
   useSandbox: process.env.P24_USE_SANDBOX,
   merchantId: process.env.P24_MERCHANT_ID,
   posId: process.env.P24_POS_ID,
-  apiKey: process.env.P24_SANDBOX_API_KEY,
-  crc: process.env.P24_SANDBOX_CRC
+  apiKeySandbox: process.env.P24_SANDBOX_API_KEY,
+  apiKeyProd: process.env.P24_API_KEY,
+  crcSandbox: process.env.P24_SANDBOX_CRC,
+  crcProd: process.env.P24_CRC,
 });
+
 import { NextResponse } from "next/server";
-import { Przelewy24 } from "@ingameltd/node-przelewy24";
+import Przelewy24 from "@ingameltd/node-przelewy24";
 
 export async function POST(req: Request) {
   try {
@@ -48,7 +51,10 @@ export async function POST(req: Request) {
 
     if (!result || !result.token) {
       console.error("P24 register error:", result);
-      return NextResponse.json({ error: "P24 register failed" }, { status: 500 });
+      return NextResponse.json(
+        { error: "P24 register failed" },
+        { status: 500 }
+      );
     }
 
     const redirectUrl = p24.getPaymentUrl(result.token);
