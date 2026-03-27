@@ -1,3 +1,10 @@
+console.log("ENV CHECK", {
+  useSandbox: process.env.P24_USE_SANDBOX,
+  merchantId: process.env.P24_MERCHANT_ID,
+  posId: process.env.P24_POS_ID,
+  apiKey: process.env.P24_SANDBOX_API_KEY,
+  crc: process.env.P24_SANDBOX_CRC
+});
 import { NextResponse } from "next/server";
 import { Przelewy24 } from "@ingameltd/node-przelewy24";
 
