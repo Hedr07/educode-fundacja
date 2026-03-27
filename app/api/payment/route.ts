@@ -2,12 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import crypto from 'crypto'
 
 const MERCHANT_ID = Number(process.env.P24_MERCHANT_ID)
-const IS_SANDBOX = process.env.P24_USE_SANDBOX === 'true'
 const API_KEY = process.env.P24_API_KEY!
-const CRC = IS_SANDBOX ? process.env.P24_SANDBOX_CRC! : process.env.P24_CRC!
-const BASE_URL = IS_SANDBOX
-  ? 'https://sandbox.przelewy24.pl/api/v1'
-  : 'https://secure.przelewy24.pl/api/v1'
+const CRC = process.env.P24_CRC!
+const BASE_URL = 'https://secure.przelewy24.pl/api/v1'
 
 function calculateSHA384(data: string): string {
   return crypto.createHash('sha384').update(data).digest('hex')
@@ -53,8 +50,6 @@ export async function POST(req: NextRequest) {
       sign,
     }
 
-    console.log('P24 request:', BASE_URL, 'sandbox:', IS_SANDBOX, 'merchantId:', MERCHANT_ID)
-
     const credentials = Buffer.from(`${MERCHANT_ID}:${API_KEY}`).toString('base64')
 
     const response = await fetch(`${BASE_URL}/transaction/register`, {
@@ -73,10 +68,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: `P24 error: ${JSON.stringify(data)}` }, { status: 500 })
     }
 
-    const redirectUrl = IS_SANDBOX
-      ? `https://sandbox.przelewy24.pl/trnRequest/${data.data.token}`
-      : `https://secure.przelewy24.pl/trnRequest/${data.data.token}`
-
+    const redirectUrl = `https://secure.przelewy24.pl/trnRequest/${data.data.token}`
     return NextResponse.json({ redirectUrl })
 
   } catch (err: any) {
