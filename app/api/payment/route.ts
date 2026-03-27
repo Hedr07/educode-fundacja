@@ -1,15 +1,11 @@
-console.log("ENV CHECK", {
-  useSandbox: process.env.P24_USE_SANDBOX,
-  merchantId: process.env.P24_MERCHANT_ID,
-  posId: process.env.P24_POS_ID,
-  apiKeySandbox: process.env.P24_SANDBOX_API_KEY,
-  apiKeyProd: process.env.P24_API_KEY,
-  crcSandbox: process.env.P24_SANDBOX_CRC,
-  crcProd: process.env.P24_CRC,
-});
-
 import { NextResponse } from "next/server";
-import przelewy24 from "@ingameltd/node-przelewy24";
+import {
+  P24,
+  Currency,
+  Country,
+  Language,
+  Encoding,
+} from "@ingameltd/node-przelewy24";
 
 export async function POST(req: Request) {
   try {
@@ -19,7 +15,9 @@ export async function POST(req: Request) {
     const useSandbox = process.env.P24_USE_SANDBOX === "true";
 
     const merchantId = Number(process.env.P24_MERCHANT_ID);
-    const posId = Number(process.env.P24_POS_ID);
+    const posId = Number(
+      process.env.P24_POS_ID ?? process.env.P24_MERCHANT_ID
+    );
 
     const apiKey = useSandbox
       ? process.env.P24_SANDBOX_API_KEY
@@ -29,39 +27,42 @@ export async function POST(req: Request) {
       ? process.env.P24_SANDBOX_CRC
       : process.env.P24_CRC;
 
-    const p24 = przelewy24({
+    console.log("ENV CHECK", {
+      useSandbox,
       merchantId,
       posId,
-      apiKey: apiKey!,
-      crc: crc!,
+      hasApiKey: !!apiKey,
+      hasCrc: !!crc,
+    });
+
+    const p24 = new P24(merchantId, posId, crc!, {
       sandbox: useSandbox,
+      apiKey: apiKey!,
     });
 
     const sessionId = `donation_${Date.now()}`;
 
-    const result = await p24.registerTransaction({
+    const order = {
       sessionId,
       amount: amount * 100,
-      currency: "PLN",
+      currency: Currency.PLN,
       description: "Darowizna na fundację EduCode",
-      email: "donor@educode.org.pl",
+      email: body.email ?? "donor@educode.org.pl",
+      country: Country.Poland,
+      language: Language.PL,
       urlReturn: "https://educode.org.pl/",
       urlStatus: "https://educode.org.pl/api/payment/status",
-    });
+      encoding: Encoding.UTF8,
+    };
 
-    if (!result || !result.token) {
-      console.error("P24 register error:", result);
-      return NextResponse.json(
-        { error: "P24 register failed" },
-        { status: 500 }
-      );
-    }
+    const paymentUrl = await p24.createTransaction(order);
 
-    const redirectUrl = p24.getPaymentUrl(result.token);
-
-    return NextResponse.json({ url: redirectUrl });
+    return NextResponse.json({ url: paymentUrl });
   } catch (err: any) {
     console.error("P24 error:", err);
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    return NextResponse.json(
+      { error: err.message ?? "P24 error" },
+      { status: 500 }
+    );
   }
 }
