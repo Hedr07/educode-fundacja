@@ -38,9 +38,11 @@ export async function POST(req: Request) {
     console.log("=== P24 DEBUG END ===");
     // === DEBUG END ===
 
-    const p24 = new P24(merchantId, posId, crc!);
+    // POPRAWNY KONSTRUKTOR DLA TWOJEJ WERSJI SDK (4 ARGUMENTY)
+    const p24 = new P24(merchantId, posId, apiKey!, crc!);
+
+    // SANDBOX / PRODUKCJA
     p24.setSandbox(useSandbox);
-    p24.setApiKey(apiKey!);
 
     const sessionId = `donation_${Date.now()}`;
 
