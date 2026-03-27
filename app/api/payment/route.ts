@@ -1,40 +1,86 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { P24, Order, Currency, Country, Language } from '@ingameltd/node-przelewy24'
+import crypto from 'crypto'
 
 const MERCHANT_ID = Number(process.env.P24_MERCHANT_ID)
 const IS_SANDBOX = process.env.P24_USE_SANDBOX === 'true'
+const API_KEY = process.env.P24_API_KEY!
 const CRC = IS_SANDBOX ? process.env.P24_SANDBOX_CRC! : process.env.P24_CRC!
-const REPORT_KEY = process.env.P24_REPORT_KEY!
+const BASE_URL = IS_SANDBOX
+  ? 'https://sandbox.przelewy24.pl/api/v1'
+  : 'https://secure.przelewy24.pl/api/v1'
+
+function calculateSHA384(data: string): string {
+  return crypto.createHash('sha384').update(data).digest('hex')
+}
 
 export async function POST(req: NextRequest) {
   try {
     const { amount, frequency } = await req.json()
     const num = parseFloat(amount)
+
     if (!amount || isNaN(num) || num <= 0) {
       return NextResponse.json({ error: 'Nieprawidłowa kwota' }, { status: 400 })
     }
-    const p24 = new P24(MERCHANT_ID, MERCHANT_ID, REPORT_KEY, CRC, {
-      sandbox: IS_SANDBOX,
-    })
-    const sessionId = `EDUCODE-${Date.now()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`
-    const baseUrl = 'https://educode.org.pl'
-    const order: Order = {
+
+    const sessionId = `EDUCODE-${Date.now()}`
+    const amountInGrosze = Math.round(num * 100)
+
+    const hashData = {
       sessionId,
-      amount: Math.round(num * 100),
-      currency: Currency.PLN,
+      merchantId: MERCHANT_ID,
+      amount: amountInGrosze,
+      currency: 'PLN',
+      crc: CRC,
+    }
+    const sign = calculateSHA384(JSON.stringify(hashData))
+
+    const order = {
+      merchantId: MERCHANT_ID,
+      posId: MERCHANT_ID,
+      sessionId,
+      amount: amountInGrosze,
+      currency: 'PLN',
       description: frequency === 'monthly'
         ? 'Darowizna miesięczna - Fundacja EduCode'
         : 'Darowizna jednorazowa - Fundacja EduCode',
       email: 'kontakt@educode.org.pl',
-      country: Country.Poland,
-      language: Language.PL,
-      urlReturn: `${baseUrl}/podziekowanie`,
-      urlStatus: `${baseUrl}/api/payment/notify`,
+      country: 'PL',
+      language: 'pl',
+      urlReturn: 'https://educode.org.pl/podziekowanie',
+      urlStatus: 'https://educode.org.pl/api/payment/notify',
+      timeLimit: 20,
+      encoding: 'UTF-8',
+      sign,
     }
-    const result = await p24.createTransaction(order)
-    return NextResponse.json({ redirectUrl: result.toString() })
+
+    console.log('P24 request:', BASE_URL, 'sandbox:', IS_SANDBOX, 'merchantId:', MERCHANT_ID)
+
+    const credentials = Buffer.from(`${MERCHANT_ID}:${API_KEY}`).toString('base64')
+
+    const response = await fetch(`${BASE_URL}/transaction/register`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Basic ${credentials}`,
+      },
+      body: JSON.stringify(order),
+    })
+
+    const data = await response.json()
+    console.log('P24 response:', response.status, JSON.stringify(data))
+
+    if (!response.ok || !data?.data?.token) {
+      return NextResponse.json({ error: `P24 error: ${JSON.stringify(data)}` }, { status: 500 })
+    }
+
+    const redirectUrl = IS_SANDBOX
+      ? `https://sandbox.przelewy24.pl/trnRequest/${data.data.token}`
+      : `https://secure.przelewy24.pl/trnRequest/${data.data.token}`
+
+    return NextResponse.json({ redirectUrl })
+
   } catch (err: any) {
-    console.error('P24 error:', err?.message ?? err)
-    return NextResponse.json({ error: 'Błąd rejestracji transakcji' }, { status: 500 })
+    console.error('P24 exception:', err?.message ?? err)
+    return NextResponse.json({ error: err?.message ?? 'Błąd serwera' }, { status: 500 })
   }
 }
