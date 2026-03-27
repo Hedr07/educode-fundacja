@@ -3,8 +3,13 @@ import crypto from 'crypto'
 
 const P24_MERCHANT_ID = process.env.P24_MERCHANT_ID!
 const P24_API_KEY = process.env.P24_API_KEY!
-const P24_CRC = process.env.P24_CRC!
-const P24_BASE_URL = 'https://secure.przelewy24.pl'
+const IS_SANDBOX = process.env.NODE_ENV !== 'production'
+const P24_CRC = IS_SANDBOX
+  ? process.env.P24_SANDBOX_CRC!
+  : process.env.P24_CRC!
+const P24_BASE_URL = IS_SANDBOX
+  ? 'https://sandbox.przelewy24.pl'
+  : 'https://secure.przelewy24.pl'
 
 export async function POST(req: NextRequest) {
   try {
