@@ -27,21 +27,19 @@ export async function POST(req: Request) {
       ? process.env.P24_SANDBOX_CRC
       : process.env.P24_CRC;
 
-    console.log("ENV CHECK", {
-      useSandbox,
-      merchantId,
-      posId,
-      hasApiKey: !!apiKey,
-      hasCrc: !!crc,
-    });
+    // === DEBUG START ===
+    console.log("=== P24 DEBUG START ===");
+    console.log("useSandbox:", useSandbox);
+    console.log("merchantId:", merchantId);
+    console.log("posId:", posId);
+    console.log("apiKey:", apiKey);
+    console.log("crc:", crc);
+    console.log("REQUEST_BODY:", body);
+    console.log("=== P24 DEBUG END ===");
+    // === DEBUG END ===
 
-    // --- POPRAWNY KONSTRUKTOR ---
     const p24 = new P24(merchantId, posId, crc!);
-
-    // --- POPRAWNE USTAWIENIE SANDBOX ---
     p24.setSandbox(useSandbox);
-
-    // --- POPRAWNE USTAWIENIE API KEY ---
     p24.setApiKey(apiKey!);
 
     const sessionId = `donation_${Date.now()}`;
