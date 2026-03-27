@@ -9,7 +9,7 @@ console.log("ENV CHECK", {
 });
 
 import { NextResponse } from "next/server";
-import Przelewy24 from "@ingameltd/node-przelewy24";
+import przelewy24 from "@ingameltd/node-przelewy24";
 
 export async function POST(req: Request) {
   try {
@@ -29,7 +29,7 @@ export async function POST(req: Request) {
       ? process.env.P24_SANDBOX_CRC
       : process.env.P24_CRC;
 
-    const p24 = new Przelewy24({
+    const p24 = przelewy24({
       merchantId,
       posId,
       apiKey: apiKey!,
