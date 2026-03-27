@@ -1,67 +1,46 @@
-import { NextResponse } from "next/server";
-import {
-  P24,
-  Currency,
-  Country,
-  Language,
-  Encoding,
-} from "@ingameltd/node-przelewy24";
+import { NextRequest, NextResponse } from 'next/server'
+import { P24, Order, Currency, Country, Language } from '@ingameltd/node-przelewy24'
 
-export async function POST(req: Request) {
+const MERCHANT_ID = Number(process.env.P24_MERCHANT_ID)
+const IS_SANDBOX = process.env.P24_USE_SANDBOX === 'true'
+const CRC = IS_SANDBOX ? process.env.P24_SANDBOX_CRC! : process.env.P24_CRC!
+const REPORT_KEY = process.env.P24_REPORT_KEY!
+
+export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
-    const amount = Number(body.amount);
+    const { amount, frequency } = await req.json()
 
-    const useSandbox = process.env.P24_USE_SANDBOX === "true";
+    const num = parseFloat(amount)
+    if (!amount || isNaN(num) || num <= 0) {
+      return NextResponse.json({ error: 'Nieprawidłowa kwota' }, { status: 400 })
+    }
 
-    const merchantId = Number(process.env.P24_MERCHANT_ID);
-    const posId = Number(
-      process.env.P24_POS_ID ?? process.env.P24_MERCHANT_ID
-    );
+    const p24 = new P24(MERCHANT_ID, MERCHANT_ID, REPORT_KEY, CRC, {
+      sandbox: IS_SANDBOX,
+    })
 
-    const apiKey = useSandbox
-      ? process.env.P24_SANDBOX_API_KEY
-      : process.env.P24_API_KEY;
+    const sessionId = `EDUCODE-${Date.now()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`
+    const baseUrl = 'https://educode.org.pl'
 
-    const crc = useSandbox
-      ? process.env.P24_SANDBOX_CRC
-      : process.env.P24_CRC;
-
-    console.log("=== P24 DEBUG START ===");
-    console.log("useSandbox:", useSandbox);
-    console.log("merchantId:", merchantId);
-    console.log("posId:", posId);
-    console.log("apiKey:", apiKey);
-    console.log("crc:", crc);
-    console.log("REQUEST_BODY:", body);
-    console.log("=== P24 DEBUG END ===");
-
-    // POPRAWNY KONSTRUKTOR DLA TWOJEGO SDK (5 ARGUMENTÓW)
-    const p24 = new P24(merchantId, posId, apiKey!, crc!, useSandbox);
-
-    const sessionId = `donation_${Date.now()}`;
-
-    const order = {
+    const order: Order = {
       sessionId,
-      amount: amount * 100,
+      amount: Math.round(num * 100),
       currency: Currency.PLN,
-      description: "Darowizna na fundację EduCode",
-      email: body.email ?? "donor@educode.org.pl",
+      description: frequency === 'monthly'
+        ? 'Darowizna miesięczna - Fundacja EduCode'
+        : 'Darowizna jednorazowa - Fundacja EduCode',
+      email: 'kontakt@educode.org.pl',
       country: Country.Poland,
       language: Language.PL,
-      urlReturn: "https://educode.org.pl/",
-      urlStatus: "https://educode.org.pl/api/payment/status",
-      encoding: Encoding.UTF8,
-    };
+      urlReturn: `${baseUrl}/podziekowanie`,
+      urlStatus: `${baseUrl}/api/payment/notify`,
+    }
 
-    const paymentUrl = await p24.createTransaction(order);
+    const result = await p24.createTransaction(order)
+    return NextResponse.json({ redirectUrl: result.toString() })
 
-    return NextResponse.json({ url: paymentUrl });
   } catch (err: any) {
-    console.error("P24 error:", err);
-    return NextResponse.json(
-      { error: err.message ?? "P24 error" },
-      { status: 500 }
-    );
+    console.error('P24 error:', err?.message ?? err)
+    return NextResponse.json({ error: 'Błąd rejestracji transakcji' }, { status: 500 })
   }
 }
