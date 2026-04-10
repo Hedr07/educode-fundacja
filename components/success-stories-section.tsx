@@ -13,8 +13,8 @@ const stories = [
     image: '/images/story-kacper.jpg',
   },
   {
-    name: 'SP nr 3 w Sycowie',
-    role: 'Szkoła partnerska',
+    name: 'Kępiński Ośrodek Kultury',
+    role: 'Partner fundacji',
     quote: 'Współpraca z Fundacją EduCode pozwoliła nam wprowadzić nowoczesne zajęcia z robotyki. Uczniowie są zachwyceni!',
     image: '/images/story-sp-sycow.jpg',
   },
